@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "157974979071",
+    "firebase_url": "https://jungletournament-c6e71.firebaseio.com",
+    "project_id": "jungletournament-c6e71",
+    "storage_bucket": "jungletournament-c6e71.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:157974979071:android:bf9deaf41c4b1214",
+        "android_client_info": {
+          "package_name": "com.example.jungletournament"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "157974979071-h3k57qj2hch7sdri8mln3ac2ia4i8dll.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCd7UjTHZuLRjtMsmn2uq6YslX9bHXwkU0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "157974979071-h3k57qj2hch7sdri8mln3ac2ia4i8dll.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "157974979071-i83o1ctgq57mbd0jgd44u7p493qqb77k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.jungletournament"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

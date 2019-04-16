@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>157974979071-i83o1ctgq57mbd0jgd44u7p493qqb77k.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.157974979071-i83o1ctgq57mbd0jgd44u7p493qqb77k</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCc8Cm9sGmtJwWDjZ_B1q-fDgrfadz_7zs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>157974979071</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.jungletournament</string>
+	<key>PROJECT_ID</key>
+	<string>jungletournament-c6e71</string>
+	<key>STORAGE_BUCKET</key>
+	<string>jungletournament-c6e71.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:157974979071:ios:bf9deaf41c4b1214</string>
+	<key>DATABASE_URL</key>
+	<string>https://jungletournament-c6e71.firebaseio.com</string>
+</dict>
+</plist>
