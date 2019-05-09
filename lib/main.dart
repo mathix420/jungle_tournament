@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -26,11 +28,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class JungleChoice extends Container {
-  JungleChoice({Key key, this.pos, this.color, this.url}) : super(key: key);
+  JungleChoice({Key key, this.pos, this.color, this.url, this.onClick})
+      : super(key: key);
 
   final String pos;
   final String url;
   final Color color;
+  final Function onClick;
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +47,15 @@ class JungleChoice extends Container {
         height: 400,
         child: ClipRRect(
           borderRadius: new BorderRadius.all(new Radius.circular(8.0)),
-          child: new FadeInImage(
-            image: (url != null && url.length > 0)
-                ? new NetworkImage(url)
-                : new AssetImage("assets/none.png"),
-            fit: BoxFit.cover,
-            placeholder: new AssetImage("assets/none.png"),
+          child: new GestureDetector(
+            onTap: () => this.onClick(),
+            child: new FadeInImage(
+              image: (url != null && url.length > 0)
+                  ? new NetworkImage(url)
+                  : new AssetImage("assets/none.png"),
+              fit: BoxFit.cover,
+              placeholder: new AssetImage("assets/none.png"),
+            ),
           ),
         ),
       ),
@@ -81,20 +88,84 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: StreamBuilder(
-        stream: Firestore.instance.collection('fights').snapshots(),
+        stream: Firestore.instance.collection('matchs').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) return CircularProgressIndicator();
-          return JungleHome(documents: snapshot.data.documents);
+          DocumentSnapshot doc;
+          snapshot.data.documents.forEach((document) {
+            if (document.data['started'] && !document.data['finished']) {
+              doc = document;
+            }
+          });
+          if (doc == null || doc.data['opponents'] == null) {
+            return CircularProgressIndicator();
+          }
+          return JungleHomeStateful(
+              fightersList: doc.data['opponents'],
+              title: doc.data['title'].toString());
         },
       ),
     );
   }
 }
 
-class JungleHome extends StatelessWidget {
-  final List<DocumentSnapshot> documents;
+class ScoreView extends StatelessWidget {
+  final List<dynamic> fightersList;
+  final String title;
 
-  JungleHome({this.documents});
+  ScoreView({this.fightersList, this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Center(child: Text("Tu as voté")),
+    );
+  }
+}
+
+class JungleHomeStateful extends StatefulWidget {
+  final List<dynamic> fightersList;
+  final String title;
+
+  JungleHomeStateful({this.fightersList, this.title});
+
+  @override
+  _JungleHomeStatefulState createState() {
+    return new _JungleHomeStatefulState(
+        futureFightersList: fightersList, title: title);
+  }
+}
+
+class _JungleHomeStatefulState extends State<JungleHomeStateful> {
+  final List<dynamic> futureFightersList;
+  final String title;
+  List<DocumentSnapshot> _fightersList = new List<DocumentSnapshot>();
+
+  _JungleHomeStatefulState({this.futureFightersList, this.title}) {
+    getOpponentsList(this.futureFightersList).then((val) => setState(() {
+          _fightersList = val;
+        }));
+  }
+
+  Future<List<DocumentSnapshot>> getOpponentsList(
+      List<dynamic> fightersList) async {
+    return [
+      await fightersList[0].get(),
+      await fightersList[1].get(),
+    ];
+  }
+
+  void vote(int index) {
+    print("IN");
+    Firestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot freshSnap =
+          await transaction.get(_fightersList[index].reference);
+      await transaction
+          .update(freshSnap.reference, {'votes': freshSnap['votes'] + 1});
+    });
+    Route route = MaterialPageRoute(builder: (context) => ScoreView());
+    Navigator.pushReplacement(context, route);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,13 +180,17 @@ class JungleHome extends StatelessWidget {
               children: <Widget>[
                 JungleChoice(
                   pos: "left",
-                  url:
-                      "https://thefivebeasts.files.wordpress.com/2015/01/picture-grey-wolf.jpg",
+                  url: _fightersList.length == 2
+                      ? _fightersList[0].data['image'].toString()
+                      : null,
+                  onClick: () => vote(0),
                 ),
                 JungleChoice(
                   pos: "right",
-                  url:
-                      "http://fantasticlass.weebly.com/uploads/4/6/1/7/4617850/948548969_orig.jpg",
+                  url: _fightersList.length == 2
+                      ? _fightersList[1].data['image'].toString()
+                      : null,
+                  onClick: () => vote(1),
                 ),
               ],
             ),
@@ -145,28 +220,50 @@ class JungleHome extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(4, 4, 4, 0),
               child: FloatingActionButton.extended(
+                heroTag: "img1",
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
-                label: Text("Loup", style: TextStyle(fontSize: 18)),
-                icon: Text("🐺", style: TextStyle(fontSize: 30)),
-                onPressed: () {},
+                label: Text(
+                  _fightersList.length == 2
+                      ? _fightersList[0].data['name'].toString()
+                      : 'null',
+                  style: TextStyle(fontSize: 18),
+                ),
+                icon: Text(
+                  _fightersList.length == 2
+                      ? _fightersList[0].data['emoji'].toString()
+                      : '',
+                  style: TextStyle(fontSize: 30),
+                ),
+                onPressed: () => vote(0),
               ),
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(4, 4, 4, 0),
               child: FloatingActionButton.extended(
+                heroTag: "img2",
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
-                label: Text(documents[0].data['name'].toString(), style: TextStyle(fontSize: 18)),
-                icon: Text("🐯", style: TextStyle(fontSize: 30)),
-                onPressed: () {},
+                label: Text(
+                  _fightersList.length == 2
+                      ? _fightersList[1].data['name'].toString()
+                      : 'null',
+                  style: TextStyle(fontSize: 18),
+                ),
+                icon: Text(
+                  _fightersList.length == 2
+                      ? _fightersList[1].data['emoji'].toString()
+                      : '',
+                  style: TextStyle(fontSize: 30),
+                ),
+                onPressed: () => vote(1),
               ),
             ),
           ],
         ),
         Padding(
           child: Text(
-            "Qualifications",
+            title,
             style: TextStyle(
               fontSize: 30,
               fontFamily: "Komikaze",
