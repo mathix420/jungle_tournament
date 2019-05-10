@@ -229,20 +229,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class ScoreView extends StatelessWidget {
-  final List<dynamic> fightersList;
-  final String title;
-
-  ScoreView({this.fightersList, this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Center(child: Text("Tu as voté")),
-    );
-  }
-}
-
 class JungleHomeStateful extends StatefulWidget {
   final List<dynamic> fightersList;
   final String title;
