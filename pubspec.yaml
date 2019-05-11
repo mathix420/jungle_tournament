@@ -21,6 +21,8 @@ dependencies:
   cloud_firestore:
   firebase_auth:
 
+  timeline_list: ^0.0.3
+
   flutter:
     sdk: flutter
 
