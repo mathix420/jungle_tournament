@@ -1,15 +1,17 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 
+// import 'no_connection.dart';
 import 'jungle_choice.dart';
 import 'is_blurred.dart';
-import 'no_connection.dart';
 import 'no_fight.dart';
 import 'classement_page.dart';
+import 'loading_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -20,19 +22,61 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return DashboardScreen();
+    // TODO: Run LoadingPage() for 2 secs;
+    return StreamBuilder(
+        stream: FirebaseAuth.instance.signInAnonymously().asStream(),
+        builder:
+            (BuildContext context1, AsyncSnapshot<FirebaseUser> snapshot1) {
+          if (!snapshot1.hasData) return LoadingPage();
+
+          return StreamBuilder(
+              stream: Firestore.instance
+                  .collection('votes')
+                  .document('map')
+                  .snapshots(),
+              builder: (
+                BuildContext context2,
+                AsyncSnapshot<DocumentSnapshot> snapshot2,
+              ) {
+                if (!snapshot2.hasData) return LoadingPage();
+
+                if (snapshot2.data.data['users'].keys != null &&
+                    !snapshot2.data.data['users'].keys
+                        .contains(snapshot1.data.uid.toString())) {
+                  Firestore.instance.runTransaction((transaction) async {
+                    Map newData = snapshot2.data['users'];
+                    newData[snapshot1.data.uid.toString()] = [];
+                    await transaction
+                        .update(snapshot2.data.reference, {'users': newData});
+                  });
+                }
+                List<dynamic> listOfVotes =
+                    snapshot2.data.data['users'][snapshot1.data.uid.toString()];
+
+                return DashboardScreen(
+                  user: snapshot1.data,
+                  listOfVotes: listOfVotes,
+                  votesDatabase: snapshot2.data,
+                );
+              });
+        });
   }
 }
 
 class DashboardScreen extends StatefulWidget {
-  DashboardScreen({Key key}) : super(key: key);
+  DashboardScreen({Key key, this.user, this.listOfVotes, this.votesDatabase})
+      : super(key: key);
+
+  final List<dynamic> listOfVotes;
+  final FirebaseUser user;
+  final DocumentSnapshot votesDatabase;
 
   @override
   _DashboardScreenState createState() => new _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final PageController _pageController = new PageController(initialPage: 0);
+  final PageController _pageController = new PageController();
   int _pageIndex = 0;
 
   void onPageChanged(int page) {
@@ -56,7 +100,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         body: new PageView(
           children: [
-            MyHomePage(),
+            MyHomePage(user: widget.user),
             ClassementScreen(),
           ],
           controller: _pageController,
@@ -88,7 +132,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+  MyHomePage({Key key, this.user, this.listOfVotes, this.votesDatabase})
+      : super(key: key);
+
+  final FirebaseUser user;
+  final List<dynamic> listOfVotes;
+  final DocumentSnapshot votesDatabase;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -98,62 +147,30 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: FirebaseAuth.instance.signInAnonymously().asStream(),
-        builder:
-            (BuildContext context1, AsyncSnapshot<FirebaseUser> snapshot1) {
-          if (!snapshot1.hasData) return NoConnectionScreen();
-          return StreamBuilder(
-              stream: Firestore.instance
-                  .collection('votes')
-                  .document('map')
-                  .snapshots(),
-              builder: (
-                BuildContext context2,
-                AsyncSnapshot<DocumentSnapshot> snapshot2,
-              ) {
-                if (!snapshot2.hasData) return CircularProgressIndicator();
-
-                if (snapshot2.data.data['users'].keys != null &&
-                    !snapshot2.data.data['users'].keys
-                        .contains(snapshot1.data.uid.toString())) {
-                  Firestore.instance.runTransaction((transaction) async {
-                    Map newData = snapshot2.data['users'];
-                    newData[snapshot1.data.uid.toString()] = [];
-                    await transaction
-                        .update(snapshot2.data.reference, {'users': newData});
-                  });
-                }
-                List<dynamic> listOfVotes =
-                    snapshot2.data.data['users'][snapshot1.data.uid.toString()];
-
-                return StreamBuilder(
-                    stream: Firestore.instance.collection('matchs').snapshots(),
-                    builder: (
-                      BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot,
-                    ) {
-                      if (!snapshot.hasData) return CircularProgressIndicator();
-                      DocumentSnapshot doc;
-                      snapshot.data.documents.forEach((document) {
-                        if (document.data['started'] &&
-                            !document.data['finished']) {
-                          doc = document;
-                        }
-                      });
-                      if (doc == null || doc.data['opponents'] == null) {
-                        return NoCurrentFights();
-                      }
-                      return JungleHomeStateful(
-                        fightersList: doc.data['opponents'],
-                        title: doc.data['title'].toString(),
-                        loggedInUser: snapshot1.data,
-                        isBlurred: listOfVotes != null &&
-                            listOfVotes.contains(doc.documentID.toString()),
-                        votesDatabase: snapshot2.data,
-                        fightId: doc.documentID.toString(),
-                      );
-                    });
-              });
+        stream: Firestore.instance.collection('matchs').snapshots(),
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<QuerySnapshot> snapshot,
+        ) {
+          if (!snapshot.hasData) return Container();
+          DocumentSnapshot doc;
+          snapshot.data.documents.forEach((document) {
+            if (document.data['started'] && !document.data['finished']) {
+              doc = document;
+            }
+          });
+          if (doc == null || doc.data['opponents'] == null) {
+            return NoCurrentFights();
+          }
+          return JungleHomeStateful(
+            fightersList: doc.data['opponents'],
+            title: doc.data['title'].toString(),
+            loggedInUser: widget.user,
+            isBlurred: widget.listOfVotes != null &&
+                widget.listOfVotes.contains(doc.documentID.toString()),
+            votesDatabase: widget.votesDatabase,
+            fightId: doc.documentID.toString(),
+          );
         });
   }
 }

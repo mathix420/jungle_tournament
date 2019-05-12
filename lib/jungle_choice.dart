@@ -42,6 +42,7 @@ class _JungleChoiceState extends State<JungleChoice> {
         fighterImage: fighterImage,
       );
     } else {
+      // TODO: put stream builder only for text
       return StreamBuilder(
           stream: widget.fighter != null
               ? Firestore.instance
@@ -63,9 +64,8 @@ class _JungleChoiceState extends State<JungleChoice> {
                 onTap: () {},
                 fighterImage: fighterImage,
               );
-            DocumentSnapshot document = snapshot.data;
             return AlreadyVotedChoice(
-              fighter: document,
+              fighter: snapshot.data,
               onTap: widget.onTap,
               pos: widget.pos,
               key: widget.key,
