@@ -149,13 +149,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.4"
-  timeline_list:
-    dependency: "direct main"
-    description:
-      path: timeline_list
-      relative: true
-    source: path
-    version: "0.0.4"
   typed_data:
     dependency: transitive
     description:

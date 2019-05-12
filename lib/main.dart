@@ -9,7 +9,7 @@ import 'jungle_choice.dart';
 import 'is_blurred.dart';
 import 'no_connection.dart';
 import 'no_fight.dart';
-import 'graph.dart';
+import 'classement_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -32,8 +32,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final PageController _pageController = new PageController(initialPage: 1);
-  int _pageIndex = 1;
+  final PageController _pageController = new PageController(initialPage: 0);
+  int _pageIndex = 0;
 
   void onPageChanged(int page) {
     setState(() {
@@ -57,10 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: new PageView(
           children: [
             MyHomePage(),
-            Container(
-              color: Colors.black12,
-              child: ClassementScreen(),
-            ),
+            ClassementScreen(),
           ],
           controller: _pageController,
           onPageChanged: onPageChanged,

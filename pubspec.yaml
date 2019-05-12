@@ -21,9 +21,6 @@ dependencies:
   cloud_firestore:
   firebase_auth:
 
-  timeline_list:
-    path: timeline_list
-
   flutter:
     sdk: flutter
 
