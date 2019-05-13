@@ -6,7 +6,6 @@ class NoCurrentFights extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.black12,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

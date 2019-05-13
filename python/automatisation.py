@@ -22,18 +22,18 @@ winner = None
 
 for key, doc in new_doc:
     document = doc.to_dict()
-    print(key, document)
-    # TODO: faire ça
-    # # Si moins de deux opposants, on ajoute le gagnant de ce tour
-    # if len(document['opponents']) < 2:
-    #     document['opponents'] += 
-    #     db.collection(u'matchs').document(doc.id).set(document)
-    # Commence le match suivant
+    # Si moins de deux opposants, on ajoute le gagnant de ce tour
+    if len(document['opponents']) < 2 and winner != None:
+        document['opponents'].append(winner)
+        db.collection(u'matchs').document(doc.id).set(document)
+        winner = None
+    # Termine le match déjà commencé
     if document['started'] and not document['finished']:
         document['finished'] = True
         db.collection(u'matchs').document(doc.id).set(document)
+        winner = document['opponents'][document['votes'][0] <= document['votes'][1]]
         last_terminated = key
-    # Termine le match déjà commencé
+    # Commence le match suivant
     if last_terminated != None and last_terminated != key:
         time.sleep(1)
         last_terminated = None

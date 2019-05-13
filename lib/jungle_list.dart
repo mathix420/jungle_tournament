@@ -178,7 +178,7 @@ class TimeRelativeCard extends StatelessWidget {
                 padding: EdgeInsets.all(10.0),
                 child: Center(
                   child: Text(
-                    formatNumber(int.parse(votes)) + " votes",
+                    formatNumber(int.parse(votes)),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white,

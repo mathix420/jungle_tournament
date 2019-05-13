@@ -1,10 +1,12 @@
 String formatNumber(int number) {
   if (number == null)
-    return number.toString();
+    return "0 vote";
   if (number >= 1000000) {
-    return "${number ~/ 1000000}M";
+    return "${number ~/ 1000000}M votes";
   } else if (number >= 1000) {
-    return "${number ~/ 1000}k";
+    return "${number ~/ 1000}k votes";
+  } else if (number <= 1) {
+    return "$number vote";
   }
-  return number.toString();
+  return "$number votes";
 }

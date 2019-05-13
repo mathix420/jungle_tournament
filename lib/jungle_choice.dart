@@ -175,11 +175,7 @@ class AlreadyVotedChoice extends StatelessWidget {
                   child: FittedBox(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        (fighter != null && fighter.data != null
-                                ? formatNumber(vote)
-                                : '') +
-                            " votes",
+                      child: Text(formatNumber(vote),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 30, fontFamily: 'Komikaze'),
                       ),
