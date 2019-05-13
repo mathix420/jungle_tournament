@@ -27,7 +27,7 @@ class ClassementScreen extends StatelessWidget {
           BuildContext context,
           AsyncSnapshot<QuerySnapshot> snapshot,
         ) {
-          if (!snapshot.hasData) return CircularProgressIndicator();
+          if (!snapshot.hasData) return Container();
 
           return StreamBuilder(
               stream: Firestore.instance.collection('fights').snapshots(),
@@ -35,7 +35,7 @@ class ClassementScreen extends StatelessWidget {
                 BuildContext context2,
                 AsyncSnapshot<QuerySnapshot> snapshot2,
               ) {
-                if (!snapshot2.hasData) return CircularProgressIndicator();
+                if (!snapshot2.hasData) return Container();
 
                 List<FightRow> itemList = [];
                 List<DocumentSnapshot> matchsList = snapshot.data.documents;
