@@ -58,13 +58,13 @@ class ClassementScreen extends StatelessWidget {
                       opponent1 = fightersList.singleWhere((doc) =>
                           doc.documentID ==
                           document.data['opponents'][0].documentID);
-                      vote1 = opponent1.data['votes'].toString();
+                      vote1 = document.data['votes'][0].toString();
                     }
                     if (document.data['opponents'].length >= 2) {
                       opponent2 = fightersList.singleWhere((doc) =>
                           doc.documentID ==
                           document.data['opponents'][1].documentID);
-                      vote2 = opponent2.data['votes'].toString();
+                      vote2 = document.data['votes'][1].toString();
                     }
                   }
 

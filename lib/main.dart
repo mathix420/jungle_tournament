@@ -149,6 +149,7 @@ class MyHomePage extends StatelessWidget {
                         isBlurred: listOfVotes != null &&
                             listOfVotes.contains(doc.documentID.toString()),
                         votesDatabase: snapshot2.data,
+                        match: doc,
                         fightId: doc.documentID.toString(),
                       );
                     });
@@ -163,6 +164,7 @@ class JungleHomeStateful extends StatefulWidget {
   final FirebaseUser loggedInUser;
   final bool isBlurred;
   final String fightId;
+  final DocumentSnapshot match;
   final DocumentSnapshot votesDatabase;
 
   JungleHomeStateful(
@@ -171,7 +173,8 @@ class JungleHomeStateful extends StatefulWidget {
       this.loggedInUser,
       this.isBlurred,
       this.votesDatabase,
-      this.fightId});
+      this.fightId,
+      this.match,});
 
   @override
   _JungleHomeStatefulState createState() {
@@ -222,9 +225,11 @@ class _JungleHomeStatefulState extends State<JungleHomeStateful> {
       });
       Firestore.instance.runTransaction((transaction) async {
         DocumentSnapshot freshSnap =
-            await transaction.get(_fightersList[index].reference);
+            await transaction.get(widget.match.reference);
+        List<dynamic> votes = freshSnap['votes'];
+        votes[index] += 1;
         await transaction
-            .update(freshSnap.reference, {'votes': freshSnap['votes'] + 1});
+            .update(freshSnap.reference, {'votes': votes});
       });
       Firestore.instance.runTransaction((transaction) async {
         DocumentSnapshot freshSnap =
@@ -251,6 +256,7 @@ class _JungleHomeStatefulState extends State<JungleHomeStateful> {
                   isBlurred: isBlurred,
                   child: new JungleChoice(
                     pos: "left",
+                    votes: widget.match['votes'],
                     onTap: () => vote(0),
                     fighter:
                         _fightersList.length == 2 ? _fightersList[0] : null,
@@ -260,6 +266,7 @@ class _JungleHomeStatefulState extends State<JungleHomeStateful> {
                   isBlurred: isBlurred,
                   child: new JungleChoice(
                     pos: "right",
+                    votes: widget.match['votes'],
                     onTap: () => vote(1),
                     fighter:
                         _fightersList.length == 2 ? _fightersList[1] : null,

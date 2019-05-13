@@ -11,12 +11,14 @@ class JungleChoice extends StatefulWidget {
     this.color, //UTILE ???????
     this.fighter,
     this.onTap,
+    this.votes,
   });
 
   final String pos;
   final Color color;
   final Function onTap;
   final DocumentSnapshot fighter;
+  final List<dynamic> votes;
 
   @override
   _JungleChoiceState createState() => _JungleChoiceState();
@@ -71,6 +73,7 @@ class _JungleChoiceState extends State<JungleChoice> {
               key: widget.key,
               color: widget.color,
               fighterImage: fighterImage,
+              vote: widget.votes != null ? widget.votes[widget.pos == 'right' ? 1 : 0] : 0,
             );
           });
     }
@@ -126,12 +129,14 @@ class AlreadyVotedChoice extends StatelessWidget {
     this.color,
     this.fighter,
     this.onTap,
+    this.vote,
     this.fighterImage,
   });
 
   final String pos;
   final Color color;
   final Function onTap;
+  final int vote;
   final DocumentSnapshot fighter;
   final NetworkImage fighterImage;
 
@@ -172,7 +177,7 @@ class AlreadyVotedChoice extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
                         (fighter != null && fighter.data != null
-                                ? formatNumber(fighter.data['votes'])
+                                ? formatNumber(vote)
                                 : '') +
                             " votes",
                         textAlign: TextAlign.center,
