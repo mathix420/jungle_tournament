@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'is_blurred.dart';
+import 'format_number.dart';
 
 class JungleChoice extends StatefulWidget {
   JungleChoice({
@@ -42,7 +43,6 @@ class _JungleChoiceState extends State<JungleChoice> {
         fighterImage: fighterImage,
       );
     } else {
-      // TODO: put stream builder only for text
       return StreamBuilder(
           stream: widget.fighter != null
               ? Firestore.instance
@@ -100,7 +100,7 @@ class ClassicChoice extends StatelessWidget {
         margin: (pos == "left")
             ? new EdgeInsets.fromLTRB(4, 8, 2, 4)
             : new EdgeInsets.fromLTRB(2, 8, 4, 4),
-        height: 400,
+        height: MediaQuery.of(context).size.height * 0.495,
         child: ClipRRect(
           borderRadius: new BorderRadius.all(new Radius.circular(8.0)),
           child: new GestureDetector(
@@ -143,7 +143,7 @@ class AlreadyVotedChoice extends StatelessWidget {
         margin: (pos == "left")
             ? new EdgeInsets.fromLTRB(4, 8, 2, 4)
             : new EdgeInsets.fromLTRB(2, 8, 4, 4),
-        height: 400,
+        height: MediaQuery.of(context).size.height * 0.495,
         decoration: new ShapeDecoration(
           shape: new RoundedRectangleBorder(
             borderRadius: new BorderRadius.all(new Radius.circular(8.0)),
@@ -167,12 +167,18 @@ class AlreadyVotedChoice extends StatelessWidget {
                   borderRadius: new BorderRadius.all(new Radius.circular(8.0)),
                 ),
                 child: Center(
-                  child: Text(
-                    (fighter != null && fighter.data != null
-                            ? fighter.data['votes'].toString()
-                            : '') +
-                        " votes",
-                    style: TextStyle(fontSize: 30, fontFamily: 'Komikaze'),
+                  child: FittedBox(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        (fighter != null && fighter.data != null
+                                ? formatNumber(fighter.data['votes'])
+                                : '') +
+                            " votes",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 30, fontFamily: 'Komikaze'),
+                      ),
+                    ),
                   ),
                 ),
               ),

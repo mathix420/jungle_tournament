@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'format_number.dart';
 
 enum TimeIndexes { passed, current, future }
 
@@ -177,7 +178,7 @@ class TimeRelativeCard extends StatelessWidget {
                 padding: EdgeInsets.all(10.0),
                 child: Center(
                   child: Text(
-                    "$votes votes",
+                    formatNumber(int.parse(votes)) + " votes",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white,

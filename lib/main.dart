@@ -7,10 +7,12 @@ import 'package:flutter/services.dart';
 
 import 'jungle_choice.dart';
 import 'is_blurred.dart';
-import 'no_connection.dart';
 import 'no_fight.dart';
 import 'classement_page.dart';
+// import 'no_connection.dart';
 // import 'loading_page.dart';
+
+import 'relative_lib.dart';
 
 void main() => runApp(MyApp());
 
@@ -89,21 +91,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+class MyHomePage extends StatelessWidget {
+  MyHomePage();
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
         stream: FirebaseAuth.instance.signInAnonymously().asStream(),
         builder:
             (BuildContext context1, AsyncSnapshot<FirebaseUser> snapshot1) {
-          if (!snapshot1.hasData) return NoConnectionScreen();
+          if (!snapshot1.hasData) return Container();
           return StreamBuilder(
               stream: Firestore.instance
                   .collection('votes')
@@ -113,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 BuildContext context2,
                 AsyncSnapshot<DocumentSnapshot> snapshot2,
               ) {
-                if (!snapshot2.hasData) return NoConnectionScreen();
+                if (!snapshot2.hasData) return Container();
 
                 if (snapshot2.data.data['users'].keys != null &&
                     !snapshot2.data.data['users'].keys
@@ -134,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot,
                     ) {
-                      if (!snapshot.hasData) return NoConnectionScreen();
+                      if (!snapshot.hasData) return Container();
                       DocumentSnapshot doc;
                       snapshot.data.documents.forEach((document) {
                         if (document.data['started'] &&
@@ -274,7 +271,7 @@ class _JungleHomeStatefulState extends State<JungleHomeStateful> {
               "VS",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 100,
+                fontSize: relativeDouble(context, 100),
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Martyric',
                 color: Colors.yellow[700],
